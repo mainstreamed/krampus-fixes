@@ -1,8 +1,9 @@
 # Krampus Fixes
 
-[main.lua](main.lua)
+Put [main.lua](main.lua) or loadstring in autoexec for the fixes to work
 
-`loadstring(request({Url='https://raw.githubusercontent.com/mainstreamed/krampus-fixes/main/main.lua',Method='GET'}).Body)()` 
+Loadstring
+`loadstring(request({Url='https://raw.githubusercontent.com/mainstreamed/krampus-fixes/main/main.lua',Method='GET'}).Body)()`
 
 includes:
 - added decompile function (not mine)
