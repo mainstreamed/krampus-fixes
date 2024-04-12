@@ -7,8 +7,8 @@ Loadstring version⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀�
 `loadstring(request({Url='https://raw.githubusercontent.com/mainstreamed/krampus-fixes/main/main.lua',Method='GET'}).Body)()`
 
 **Includes:**
-- added decompile function (not mine)
-- added replaceclosure function
+- adds decompile function (not mine)
+- adds replaceclosure function
 - fix for drawings within run_on_actor
 - fix for setfpscap and getfpscap
 - fix for restorefunction crashing (scuffed asf)
