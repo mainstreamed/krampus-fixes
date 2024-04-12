@@ -6,7 +6,7 @@ Put [main.lua](main.lua) or the loadstring below in autoexec for the fixes to wo
 Loadstring version⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
 `loadstring(request({Url='https://raw.githubusercontent.com/mainstreamed/krampus-fixes/main/main.lua',Method='GET'}).Body)()`
 
-includes:
+**Includes:**
 - added decompile function (not mine)
 - added replaceclosure function
 - fix for drawings within run_on_actor
