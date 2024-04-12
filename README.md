@@ -1,4 +1,4 @@
-[![Build status](https://avatars.githubusercontent.com/u/104525888?s=36&v=4)](https://github.com/git/git/actions?query=branch%3Amaster+event%3Apush) #Luau
+[![Build status](https://avatars.githubusercontent.com/u/104525888?s=36&v=4)](https://github.com/git/git/actions?query=branch%3Amaster+event%3Apush) 
 # Krampus Fixes
 
 Put [main.lua](main.lua) or the loadstring below in autoexec for the fixes to work
