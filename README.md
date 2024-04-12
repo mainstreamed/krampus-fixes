@@ -1,6 +1,6 @@
 # Krampus Fixes
 
-Place  [main.lua][] in autoexec for the fixes
+Place [main.lua](main.lua) in autoexec for the fixes
 
 includes:
 - added decompile function (not mine)
