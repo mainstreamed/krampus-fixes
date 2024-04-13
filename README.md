@@ -8,7 +8,7 @@ Loadstring version⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀�
 
 **Includes:**
 - adds drawings within run_on_actor
-- adds isrenderobj, cleardrawcache and get/setrenderproperty to run_on_actor enviroment
+- adds all missing functions within run_on_actor (Drawing, set/getrenderproperty, isrenderobj, cleardrawcache, getactors, on_actor_created)
 - adds all fixes and additions below to run_on_actor enviroment
 - adds decompile function (not mine)
 - adds replaceclosure function
