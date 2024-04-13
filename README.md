@@ -7,11 +7,7 @@ Loadstring version⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀�
 `loadstring(request({Url='https://raw.githubusercontent.com/mainstreamed/krampus-fixes/main/main.lua',Method='GET'}).Body)();`
 
 **Includes:**
-- adds the following to run_on_actor enviroment (Drawing, set/getrenderproperty, isrenderobj, cleardrawcache, getactors, on_actor_created)
-- adds all fixes and additions below to run_on_actor enviroment
-- adds decompile function (not mine)
-- adds replaceclosure function
-- fix for setfpscap / getfpscap
-- fix for restorefunction crashing
+- adds the following to run_on_actor enviroment (Drawing, set/getrenderproperty, isrenderobj, cleardrawcache, getactors, on_actor_created, decompile, replacemetamethod)
+- adds the following functions (decompile, replacemetamethod)
+- fixes the following functions (setfpscap, getfpscap, restorefunction)
 - adds more aliases (clonefunc, restorefunc, isfunchooked)
-- recreations for some functions (maybe more optimised?)
