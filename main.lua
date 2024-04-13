@@ -214,8 +214,6 @@ funcs.run_on_actor = function(actor, string, ...)
                   local old_hookfunc            = clonefunction(hookfunc);
                   local old_clonefunction       = clonefunction(clonefunction);
 
-                  local old_isrenderobj;
-
                   local g_env = getgenv();
                   local reg = {};
 
@@ -268,29 +266,32 @@ funcs.run_on_actor = function(actor, string, ...)
                   do
                         -- drawing fix
                         do
-                              Drawing = {new = function(...)
-                                    fire(event, '❤', 'parallel', 'new', ...);
-                                    local draw_id = getlog();
-                                    local userdata = newuserdata(draw_id, 0);
-                                    local mt = {
-                                          __type = 'DrawingObject',
-                                          __index = function(self, index)
-                                                fire(event, '❤', 'parallel', 'index', draw_id, index);
-                                                return getlog();
-                                          end,
-                                          __newindex = function(self, index, value)
-                                                fire(event, '❤', 'parallel', 'newindex', draw_id, index, value);
-                                          end,
-                                          __namecall = function(self, ...)
-                                                local method = getnamecallmethod();
-                                                if (method == 'Remove' or method == 'Destroy') then
-                                                      fire(event, '❤', 'parallel', 'remove', draw_id);
-                                                end;
-                                          end,
-                                    };
-                                    setrawmetatable(userdata, mt);
-                                    return userdata;
-                              end};
+                              Drawing = {
+                                    new = function(...)
+                                          fire(event, '❤', 'parallel', 'new', ...);
+                                          local draw_id = getlog();
+                                          local userdata = newuserdata(draw_id, 0);
+                                          local mt = {
+                                                __type = 'DrawingObject',
+                                                __index = function(self, index)
+                                                      fire(event, '❤', 'parallel', 'index', draw_id, index);
+                                                      return getlog();
+                                                end,
+                                                __newindex = function(self, index, value)
+                                                      fire(event, '❤', 'parallel', 'newindex', draw_id, index, value);
+                                                end,
+                                                __namecall = function(self, ...)
+                                                      local method = getnamecallmethod();
+                                                      if (method == 'Remove' or method == 'Destroy') then
+                                                            fire(event, '❤', 'parallel', 'remove', draw_id);
+                                                      end;
+                                                end,
+                                          };
+                                          setrawmetatable(userdata, mt);
+                                          return userdata;
+                                    end,
+                                    Fonts = {UI = 0, System = 1, Plex = 2, Monospace = 3},
+                              };
                               get_comm_channel = function(id, ...)
                                     if (id ~= 0) then
                                           return old_get_comm_channel(id, ...);
@@ -303,7 +304,7 @@ funcs.run_on_actor = function(actor, string, ...)
                         end;
                         -- renderobj fix
                         do
-                              isrenderobj = function(obj)
+                              isrenderobj = function(drawing)
                                     return (typeof(drawing) == 'DrawingObject');
                               end;
                               setrenderproperty = function(obj, index, value)
@@ -337,7 +338,7 @@ funcs.run_on_actor = function(actor, string, ...)
                               end;
                               getfpscap = function()
                                     local fpscap = getfflag('TaskSchedulerTargetFps') or 60;
-                                    if (fpscap == 0) then
+                                    if (fpscap == 0 or fpscap == '0') then
                                           return 60;
                                     end;
                                     return fpscap;
@@ -532,7 +533,7 @@ funcs.setfpscap = function(fpscap)
 end;
 funcs.getfpscap = function()
       local fpscap = getfflag('TaskSchedulerTargetFps') or 60;
-      if (fpscap == 0) then
+      if (fpscap == 0 or fpscap == '0') then
             return 60;
       end;
       return fpscap;
