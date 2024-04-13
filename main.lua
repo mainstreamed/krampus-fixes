@@ -192,8 +192,10 @@ funcs.run_on_actor = function(actor, string, ...)
             local decompile = decompile;
             local replacemetamethod = replacemetamethod;
 
-            -- getactors
+            -- actor fixes
             local getactors = getactors;
+            local on_actor_created = on_actor_created;
+            local run_on_actor = run_on_actor;
 
             -- alisases
             local clonefunc = clonefunc;
@@ -239,6 +241,7 @@ funcs.run_on_actor = function(actor, string, ...)
                   local pcall             = clonefunction(pcall);
                   local rawget            = clonefunction(rawget);
                   local rawset            = clonefunction(rawset);
+                  local getDescendants    = clonefunction(game.GetDescendants);
 
                   local connections       = {};
 
@@ -391,6 +394,36 @@ funcs.run_on_actor = function(actor, string, ...)
                               g_env.restorefunc = restorefunction;
                               g_env.isfunchooked = isfunctionhooked;
                         end;
+                        -- actor fixes
+                        do
+                              getactors = function()
+                                    local actors = {};
+                                    local descendants = getDescendants(game);
+                                    for i = 1, #descendants do 
+                                          local value = descendants[i];
+                                          if (value.ClassName == 'Actor') then
+                                                insert(actors, value);
+                                          end;
+                                    end
+                                    return actors;
+                              end;
+                              run_on_actor = function()
+                                    return error('Cannot use run_on_actor within run_on_actor');
+                              end;
+                              local event = Instance.new('BindableEvent');
+                              on_actor_created = {
+                                    event = event,
+                              };
+                              game.DescendantAdded:Connect(function(obj)
+                                    if (obj and obj.ClassName == 'Actor') then
+                                          event:Fire(obj);
+                                    end;
+                              end);
+
+                              g_env.run_on_actor = run_on_actor;
+                              g_env.getactors = getactors;
+                              g_env.on_actor_created = on_actor_created;
+                        end;
                         -- additions
                         do
                               decompile = function(script)
@@ -430,6 +463,9 @@ funcs.run_on_actor = function(actor, string, ...)
                                     setrawmetatable(obj, metatable)
                                     return old;
                               end;
+
+                              g_env.replacemetamethod = replacemetamethod;
+                              g_env.decompile = decompile;
                         end;
                   end;
 
