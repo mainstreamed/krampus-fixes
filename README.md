@@ -7,7 +7,7 @@ Loadstring version⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀�
 `loadstring(request({Url='https://raw.githubusercontent.com/mainstreamed/krampus-fixes/main/main.lua',Method='GET'}).Body)();`
 
 **Includes:**
-- adds following functions to run_on_actor enviroment (Drawing, set/getrenderproperty, isrenderobj, cleardrawcache, getactors, on_actor_created)
+- adds the following to run_on_actor enviroment (Drawing, set/getrenderproperty, isrenderobj, cleardrawcache, getactors, on_actor_created)
 - adds all fixes and additions below to run_on_actor enviroment
 - adds decompile function (not mine)
 - adds replaceclosure function
