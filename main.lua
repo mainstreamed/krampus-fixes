@@ -82,6 +82,8 @@ do
                                     value = cache.drawings[value.X];
                               end;
                               cache.drawings[id][index] = value;
+                        elseif (action == 'clear') then
+                              cleardrawcache();
                         end;
                   end;
                   globals.Event:Connect(main_connection);
@@ -167,20 +169,76 @@ funcs.replacemetamethod = function(obj, method, func)
 end;
 funcs.run_on_actor = function(actor, string, ...)
       string = [[
-            local Drawing;
+            local Drawing = Drawing;
             local get_comm_channel = get_comm_channel;
 
+            -- renderobjects
+            local isrenderobj = isrenderobj;
+            local setrenderproperty = setrenderproperty;
+            local getrenderproperty = getrenderproperty;
+            local cleardrawcache = cleardrawcache;
+
+            -- fpscap fixes
+            local getfpscap = getfpscap;
+            local setfpscap = setfpscap;
+
+            -- restorefunction fix
+            local hookfunction = hookfunction;
+            local clonefunction = clonefunction;
+            local isfunctionhooked = isfunctionhooked;
+            local restorefunction = restorefunction;
+
+            -- additions
+            local decompile = decompile;
+            local replacemetamethod = replacemetamethod;
+
+            -- getactors
+            local getactors = getactors;
+
+            -- alisases
+            local clonefunc = clonefunc;
+            local isfunchooked = isfunchooked;
+            local restorefunc = restorefunc;
+            local hookfunc = hookfunc;
+            local replaceclosure = replaceclosure;
+
             do 
-                  local old_get_comm_channel = clonefunction(get_comm_channel)
+                  local setfflag                = clonefunction(setfflag);
+                  local getfflag                = clonefunction(getfflag);
+
+                  local jsondecode              = clonefunction(game.HttpService.JSONDecode);
+
+                  local old_get_comm_channel    = clonefunction(get_comm_channel);
+                  local old_hookfunc            = clonefunction(hookfunc);
+                  local old_clonefunction       = clonefunction(clonefunction);
+
+                  local old_isrenderobj;
+
+                  local g_env = getgenv();
+                  local reg = {};
+
                   local log;
                   local newuserdata       = Vector2.new;
                   local event             = old_get_comm_channel(0);
                   local fire              = clonefunction(event.Fire);
                   local getnamecallmethod = clonefunction(getnamecallmethod);
                   local setrawmetatable   = clonefunction(setrawmetatable);
+                  local base64_encode     = clonefunction(base64_encode);
+                  local request           = clonefunction(request);
+                  local getscriptbytecode = clonefunction(getscriptbytecode);
+                  local getrawmetatable   = clonefunction(getrawmetatable);
+                  local setreadonly       = clonefunction(setreadonly);
 
+                  local sub               = clonefunction(string.sub);
                   local insert            = clonefunction(table.insert);
+                  local freeze            = clonefunction(table.freeze);
+                  local clone             = clonefunction(table.clone);
+                  local typeof            = clonefunction(typeof);
                   local type              = clonefunction(type);
+                  local error             = clonefunction(error);
+                  local pcall             = clonefunction(pcall);
+                  local rawget            = clonefunction(rawget);
+                  local rawset            = clonefunction(rawset);
 
                   local connections       = {};
 
@@ -205,38 +263,174 @@ funcs.run_on_actor = function(actor, string, ...)
 
                   -- changing vars
                   do
-                        Drawing = {new = function(...)
-                              fire(event, '❤', 'parallel', 'new', ...);
-                              local draw_id = getlog();
-                              local userdata = newuserdata(draw_id, 0);
-                              local mt = {
-                                    __type = 'DrawingObject',
-                                    __index = function(self, index)
-                                          fire(event, '❤', 'parallel', 'index', draw_id, index);
-                                          return getlog();
-                                    end,
-                                    __newindex = function(self, index, value)
-                                          fire(event, '❤', 'parallel', 'newindex', draw_id, index, value);
-                                    end,
-                                    __namecall = function(self, ...)
-                                          local method = getnamecallmethod();
-                                          if (method == 'Remove' or method == 'Destroy') then
-                                                fire(event, '❤', 'parallel', 'remove', draw_id);
-                                          end;
-                                    end,
-                              };
-                              setrawmetatable(userdata, mt);
-                              return userdata;
-                        end};
-                        get_comm_channel = function(id, ...)
-                              if (id ~= 0) then
-                                    return old_get_comm_channel(id, ...);
+                        -- drawing fix
+                        do
+                              Drawing = {new = function(...)
+                                    fire(event, '❤', 'parallel', 'new', ...);
+                                    local draw_id = getlog();
+                                    local userdata = newuserdata(draw_id, 0);
+                                    local mt = {
+                                          __type = 'DrawingObject',
+                                          __index = function(self, index)
+                                                fire(event, '❤', 'parallel', 'index', draw_id, index);
+                                                return getlog();
+                                          end,
+                                          __newindex = function(self, index, value)
+                                                fire(event, '❤', 'parallel', 'newindex', draw_id, index, value);
+                                          end,
+                                          __namecall = function(self, ...)
+                                                local method = getnamecallmethod();
+                                                if (method == 'Remove' or method == 'Destroy') then
+                                                      fire(event, '❤', 'parallel', 'remove', draw_id);
+                                                end;
+                                          end,
+                                    };
+                                    setrawmetatable(userdata, mt);
+                                    return userdata;
+                              end};
+                              get_comm_channel = function(id, ...)
+                                    if (id ~= 0) then
+                                          return old_get_comm_channel(id, ...);
+                                    end;
+                                    return event;
                               end;
-                              return event;
-                        end;
 
-                        getgenv().Drawing = Drawing;
-                        getgenv().get_comm_channel = get_comm_channel;
+                              g_env.Drawing = Drawing;
+                              g_env.get_comm_channel = get_comm_channel;
+                        end;
+                        -- renderobj fix
+                        do
+                              isrenderobj = function(obj)
+                                    return (typeof(drawing) == 'DrawingObject');
+                              end;
+                              setrenderproperty = function(obj, index, value)
+                                    if (typeof(obj) ~= 'DrawingObject') then
+                                          return error(`invalid argument #1 (DrawingObject expected, got {typeof(obj)})`);
+                                    end;
+                                    obj[index] = value;
+                              end;
+                              getrenderproperty = function(obj, index)
+                                    if (typeof(obj) ~= 'DrawingObject') then
+                                          return error(`invalid argument #1 (DrawingObject expected, got {typeof(obj)})`);
+                                    end;
+                                    return obj[index];
+                              end;
+                              cleardrawcache = function()
+                                    fire(event, '❤', 'parallel', 'clear');
+                              end;
+
+                              g_env.isrenderobj = isrenderobj;
+                              g_env.setrenderproperty = setrenderproperty;
+                              g_env.getrenderproperty = getrenderproperty;
+                              g_env.cleardrawcache = cleardrawcache;
+                        end;
+                        -- fpscap fix
+                        do
+                              setfpscap = function(fpscap)
+                                    if (type(fpscap) ~= 'number') then
+                                          return error(`invalid argument #1 (number expected, got {typeof(fpscap)})`);
+                                    end;
+                                    setfflag('TaskSchedulerTargetFps', fpscap);
+                              end;
+                              getfpscap = function()
+                                    local fpscap = getfflag('TaskSchedulerTargetFps') or 60;
+                                    if (fpscap == 0) then
+                                          return 60;
+                                    end;
+                                    return fpscap;
+                              end;
+
+                              g_env.setfpscap = setfpscap;
+                              g_env.getfpscap = getfpscap;
+                        end;
+                        -- restorefunction fix
+                        do
+                              hookfunction = function(func, ...)
+                                    if (type(func) ~= 'function') then
+                                          return old_hookfunc(func, ...);
+                                    end;
+                                    local cloned = old_clonefunction(func);
+                                    local ref = old_hookfunc(func, ...);
+                                    reg[func] = cloned;
+                                    return ref;
+                              end;
+                              clonefunction = function(func, ...)
+                                    local cloned = old_clonefunction(func, ...);
+                                    if (func and reg[func]) then
+                                          reg[cloned] = reg[func];
+                                    end;
+                                    return cloned;
+                              end;
+                              restorefunction = function(func, ...)
+                                    if (func and reg[func]) then
+                                          old_hookfunc(func, reg[func]);
+                                          reg[func] = nil;
+                                    end;
+                              end;
+                              isfunctionhooked = function(func, ...)
+                                    if (reg[func]) then
+                                          return true;
+                                    end;
+                                    return false;
+                              end;
+
+                              replaceclosure = hookfunction;
+                              hookfunc = hookfunction;
+                              clonefunc = clonefunction;
+                              restorefunc = restorefunction;
+                              isfunchooked = isfunctionhooked;
+
+                              g_env.hookfunction = hookfunction;
+                              g_env.clonefunction = clonefunction;
+                              g_env.restorefunction = restorefunction;
+                              g_env.isfunctionhooked = isfunctionhooked;
+
+                              g_env.replaceclosure = hookfunction;
+                              g_env.hookfunc = hookfunction;
+                              g_env.clonefunc = clonefunction;
+                              g_env.restorefunc = restorefunction;
+                              g_env.isfunchooked = isfunctionhooked;
+                        end;
+                        -- additions
+                        do
+                              decompile = function(script)
+                                    if (not script or typeof(script) ~= 'Instance' or (script.ClassName ~= 'LocalScript' and script.ClassName ~= 'ModuleScript')) then
+                                          return error(`invalid argument #1 (LocalScript or ModuleScript expected, got {typeof(script)})`);
+                                    end;
+                                    local success, bytecode = pcall(getscriptbytecode, script);
+                                    if (not success) then
+                                          return `failed to get script bytecode {bytecode}`;
+                                    end;
+                                    local data = {
+                                          Url = 'https://unluau.lonegladiator.dev/unluau/decompile',
+                                          Method = 'POST',
+                                          Headers = {['Content-Type'] = 'application/json'},
+                                          Body = '{"version":5,"bytecode":"'..base64_encode(bytecode)..'"}',
+                                    };
+                                    local response = jsondecode(httpservice, request(data).Body);
+                                    if (response.status ~= 'ok') then
+                                          return `decompilation failed: {response.status}`;
+                                    end;
+                                    return sub(response.output, 256, #response.output);
+                              end;
+                              replacemetamethod = function(obj, method, func)
+                                    local metatable = getrawmetatable(obj);
+                                    if (not metatable or type(metatable) ~= 'table') then 
+                                          return error(`{obj} does not have a metatable`);
+                                    elseif (not rawget(metatable, method)) then
+                                          return error(`{method} is not a valid metamethod`);
+                                    elseif (not func or type(func) ~= 'function') then
+                                          return error(`invalid argument #3 (function expected, got {typeof(func)})`);
+                                    end;
+                                    metatable = clone(metatable);
+                                    local old = rawget(metatable, method);
+                                    setreadonly(metatable, false);
+                                    rawset(metatable, method, func);
+                                    freeze(metatable);
+                                    setrawmetatable(obj, metatable)
+                                    return old;
+                              end;
+                        end;
                   end;
 
                   -- blocking communications
