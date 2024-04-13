@@ -11,7 +11,7 @@ Loadstring version⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀�
 - adds all fixes and additions below to run_on_actor enviroment
 - adds decompile function (not mine)
 - adds replaceclosure function
-- fix for setfpscap
-- fix for getfpscap
+- fix for setfpscap / getfpscap
 - fix for restorefunction crashing
+- adds more aliases (clonefunc, restorefunc, isfunchooked)
 - recreations for some functions (maybe more optimised?)
