@@ -78,7 +78,7 @@ do
                         elseif (action == 'remove') then
                               cache.drawings[id]:Remove();
                         elseif (action == 'newindex') then
-                              if (index == 'Font') then
+                              if (index == 'Font' and typeof(value) == 'Vector2') then
                                     value = cache.drawings[value.X];
                               end;
                               cache.drawings[id][index] = value;
